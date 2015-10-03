@@ -108,6 +108,7 @@
       mapImage.src = "resources/SouthAfricaPicture.PNG";
 
       var mapTexture = new THREE.Texture( mapImage );
+      mapTexture.needsUdate = true;
       mapMaterial = new THREE.MeshBasicMaterial({ map: mapTexture});
       mapGeometry = new THREE.PlaneGeometry(1404,870,1,2);
       mapMesh = new THREE.Mesh(mapGeometry, mapMaterial);
