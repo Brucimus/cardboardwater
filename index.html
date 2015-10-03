@@ -103,6 +103,16 @@
 
       window.addEventListener('resize', resize, false);
       setTimeout(resize, 1);
+
+      var mapImage = document.createElement('img');
+      image.src = "resources/SouthAfricaPicture.PNG";
+
+      var mapTexture = new THREE.Texture( mapImage );
+      mapMaterial = new THREE.MeshBasicMaterial({ map: mapTexture});
+      mapGeometry = new THREE.PlaneGeometry(1404,870,1,2);
+      mapMesh = new THREE.Mesh(mapGeometry, mapMaterial);
+      mapMesh.position.set(0,100,0);
+      scene.add(mapMesh);
     }
 
     function resize() {
