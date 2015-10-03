@@ -104,9 +104,27 @@
       window.addEventListener('resize', resize, false);
       setTimeout(resize, 1);
 
+      function initPanoMapoteng() {
+        // Note: constructed panorama objects have visible: true
+        // set by default.
+        var panoramaMapoteng = new google.maps.StreetViewPanorama(
+          document.getElementById('map'), {
+        position: { lat: -29.1141417, lng: 27.9686449},
+        addressControlOptions: {
+          position: google.maps.ControlPosition.BOTTOM_CENTER
+        },
+        linksControl: false,
+        panControl: false,
+        enableCloseButton: false
+        });
+      }
+
+
+      //Map of South Africa Image
       var mapImage = document.createElement('img');
       mapImage.src = "resources/SouthAfricaPicture.PNG";
 
+      //Placement and Fabrication of South Africa Image
       var mapTexture = new THREE.Texture( mapImage );
       mapTexture.needsUdate = true;
       mapMaterial = new THREE.MeshBasicMaterial({ map: mapTexture});
@@ -114,6 +132,8 @@
       mapMesh = new THREE.Mesh(mapGeometry, mapMaterial);
       mapMesh.position.set(0,100,0);
       scene.add(mapMesh);
+
+      mapImage.addEventListener('click', initPanoMapoteng, true);
     }
 
     function resize() {
