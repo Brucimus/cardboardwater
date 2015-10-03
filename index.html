@@ -60,6 +60,113 @@
       controls.noZoom = true;
       controls.noPan = true;
 
+      function pointer(e, t) {
+        function r(e) {
+        e.touches ? (0 == e.touches.length ? (e.x = 0, e.y = 0) : (e.x = e.touches[0].clientX, e.y = e.touches[0].clientY), e.button = 0) : (e.x = e.clientX, e.y = e.clientY)
+        }
+
+        function n(t) {
+        return function(n) {
+            var i = e.getBoundingClientRect();
+            r(n), n.localX = n.x - i.left, n.localY = n.y - i.top, t(n)
+          }
+        }
+
+        function i(t, r, n, i) {
+        return i = i || e, i.addEventListener(t, r, !1),
+            function() {
+                i.removeEventListener(t, r, !1)
+            }
+          }
+
+          function o(t, n, o) {
+          function a(e) {
+            r(e), "dragend" == t && n.call(this, e), f(), d()
+            }
+            var s, l, c, h, f, d, p, m;
+              i(u ? "touchstart" : "mousedown", function(g) {
+                return r(g), m = e.getBoundingClientRect(), g.preventDefault(), g.stopPropagation(), c = s = g.x, h = l = g.y, p = !1, f = i(u ? "touchmove" : "mousemove", function(e) {
+                r(e), e.localX = e.x - m.left, e.localY = e.y - m.top, e.movementX = e.x - s, e.movementY = e.y - l, e.deltaX = e.x - c, e.deltaY = e.y - h, e.px = s, e.py = l, s = e.x, l = e.y, p || (p = !0, "dragstart" == t && n.call(this, e)), "drag" == t && n.call(this, e)
+                }, o, window), d = i(u ? "touchend" : "mouseup", a, o, window), !1
+              })
+            }
+
+          function a(e, n, o) {
+            function a() {
+            clearTimeout(v), f && f(), d && d()
+            }
+
+            function s(r) {
+            "tap" == e && l() - g < t.holdDuration && n.call(this, r), a()
+          }
+
+          function h(e) {
+            r(e), c(e.x, e.y, p, m) > t.tapMoveThreshold && a()
+          }
+          var f, d, p, m, g, v;
+            a(), i(u ? "touchstart" : "mousedown", function(a) {
+            r(a), g = Date.now(), p = a.x, m = a.y, "hold" == e && (v = setTimeout(function() {
+                n.call(o, a)
+            }, t.holdDuration)), f = i(u ? "touchend" : "mouseup", s, o, window), d = i(u ? "touchmove" : "mousemove", h, o, window)
+            }, o)
+          }
+
+          function s(e, t) {
+            for (var r in t) void 0 === e[r] && (e[r] = t[r]);
+            return e
+          }
+
+          function l() {
+            return +new Date
+          }
+
+          function c(e, t, r, n) {
+            return (e - r) * (e - r) + (t - n) * (t - n)
+          }
+          t = s(t || {}, pointer.DEFAULTS);
+          var u = function() {
+            try {
+            return document.createEvent("TouchEvent"), !0
+          } catch (e) {
+            return !1
+          }
+        }();
+        return {
+          on: function(t, r, s) {
+            switch (s = s || e, t) {
+                case "tap":
+                case "singletap":
+                case "hold":
+                    a(t, n(r), s);
+                    break;
+                case "doubletap":
+                    i("dblclick", n(r), s);
+                    break;
+                case "drag":
+                case "dragend":
+                case "dragstart":
+                    o(t, r, s);
+                    break;
+                case "touch":
+                    i(u ? "touchstart" : "mousedown", n(r), s);
+                    break;
+                case "move":
+                    i(u ? "touchmove" : "mousemove", n(r), s);
+                    break;
+                case "release":
+                    i(u ? "touchend" : "mouseup", n(r), s);
+                    break;
+                case "enter":
+                    i(u ? "touchenter" : "mouseover", n(r), s);
+                    break;
+                case "leave":
+                    i(u ? "touchleave" : "mouseout", n(r), s)
+            }
+            return this
+          }
+        }
+      }
+
       function setOrientationControls(e) {
         if (!e.alpha) {
           return;
@@ -133,7 +240,7 @@
       mapMesh.position.set(0,100,0);
       scene.add(mapMesh);
 
-      mapImage.addEventListener('click', initPanoMapoteng, true);
+      mapImage.addEventListener('click', initPanoMapoteng, false);
     }
 
     function resize() {
