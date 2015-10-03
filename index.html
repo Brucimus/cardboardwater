@@ -60,6 +60,7 @@
       controls.noZoom = true;
       controls.noPan = true;
 
+      //Pointer Icon
       function pointer(e, t) {
         function r(e) {
         e.touches ? (0 == e.touches.length ? (e.x = 0, e.y = 0) : (e.x = e.touches[0].clientX, e.y = e.touches[0].clientY), e.button = 0) : (e.x = e.clientX, e.y = e.clientY)
@@ -167,6 +168,89 @@
         }
       }
 
+      //Pointer Click Function
+       Stereoscope = function(e) {
+        function t(t, r, n, i) {
+            var o, a, s, l;
+            this.options = {
+                backgroundColor: 2566178,
+                slideDuration: 5e3,
+                transitionDuration: 500
+            };
+            for (o in i) this.options[o] = i[o];
+            for (a = new e.WebGLRenderer({
+                    canvas: t
+                }), a.setClearColor(this.options.backgroundColor), this.renderer = a, this.click = n, s = new e.Scene, this.scene = s, l = new e.OrthographicCamera(-.5, .5, -.5, .5, 0, 10), l.position.z = 1, this.camera = l, this.slides = [], this.currentSlide = -1, o = 0; o < r.length; o++) this._addSlide(r[o])
+        }
+
+        function r(e) {
+            return new Promise(function(t, r) {
+                var n = new Image;
+                n.onload = function() {
+                    t(n)
+                }, n.onerror = function() {
+                    r("failed to load " + e)
+                }, n.src = e
+            })
+        }
+
+        function n(e, t, r, n, i, o) {
+            return void 0 === o && (o = 1.70158), (t /= i / 2) < 1 ? n / 2 * t * t * (((o *= 1.525) + 1) * t - o) + r : n / 2 * ((t -= 2) * t * (((o *= 1.525) + 1) * t + o) + 2) + r
+        }
+        var i = "audio/click.mp3",
+            o = ["images/reel/0.jpg", "images/reel/1.jpg", "images/reel/2.jpg", "images/reel/3.jpg", "images/reel/4.jpg", "images/reel/5.jpg", "images/reel/6.jpg", "images/reel/7.jpg"];
+        return t.create = function(e, n) {
+            for (var a = AudioPlayer.create(n, i), s = [], l = 0; l < o.length; l++) s.push(r(o[l]));
+            var c = Promise.all(s);
+            return Promise.all([a, c]).then(function(r) {
+                var n = r[0],
+                    i = r[1];
+                return new t(e.canvas, i, n)
+            })
+        }, t.prototype.enter = function() {}, t.prototype.leave = function() {}, t.prototype.render = function(e) {
+            this._update(e), this.renderer.setClearColor(this.options.backgroundColor), this.renderer.clear(), this.renderer.render(this.scene, this.camera)
+        }, t.prototype.resize = function(e, t, r) {
+            r && (this.renderer.devicePixelRatio = r), this.renderer.setSize(e, t), this.camera.top = t / e / 2, this.camera.bottom = -t / e / 2, this.camera.updateProjectionMatrix()
+        }, t.prototype._addSlide = function(t) {
+            var r = new e.Texture(t);
+            r.needsUpdate = !0;
+            var n = new e.SpriteMaterial({
+                    map: r,
+                    color: 16777215
+                }),
+                i = new e.Sprite(n);
+            i.scale.set(1, t.height / t.width, 1), this.scene.add(i), this.slides.push(i), i.visible = !1
+        }, t.prototype._cameraPosition = function(e) {
+            var t = Math.floor(e / this._period()),
+                r = e % this._period(),
+                i = 0;
+            if (r > this.options.slideDuration) {
+                var o = (r - this.options.slideDuration) / this.options.transitionDuration;
+                i = n(void 0, o, 0, 1, 1, 1)
+            }
+            return t + i
+        }, t.prototype._period = function() {
+            return this.options.slideDuration + this.options.transitionDuration
+        }, t.prototype._positionVisibleSlides = function(e) {
+            for (var t = Math.floor(e - .5), r = Math.ceil(e + .5), n = this.slides.length, i = t; r >= i; i++) {
+                var o = (i + n) % n,
+                    a = Math.floor(i / n),
+                    s = this.slides[o];
+                s.visible = !0;
+                var l = o;
+                l += a * n, s.position.y = l
+            }
+        }, t.prototype._update = function(e) {
+            var t = this.currentSlide,
+                r = this._cameraPosition(e);
+            this.currentSlide = Math.ceil(r - .5), this._positionVisibleSlides(r), this.camera.position.y = r, this.currentSlide > t && this.click.play()
+        }, t
+    }(THREE);
+Demos.register({
+    factory: Stereoscope.create,
+    slug: "reel",
+    preview: "/images/preview/reel.jpg"
+
       function setOrientationControls(e) {
         if (!e.alpha) {
           return;
@@ -229,13 +313,13 @@
 
       //Map of South Africa Image
       var mapImage = document.createElement('img');
-      mapImage.src = "resources/SouthAfricaPicture.PNG";
+      mapImage.src = "resources/SouthAfricaPicture.jpg";
 
       //Placement and Fabrication of South Africa Image
       var mapTexture = new THREE.Texture( mapImage );
       mapTexture.needsUdate = true;
       mapMaterial = new THREE.MeshBasicMaterial({ map: mapTexture});
-      mapGeometry = new THREE.PlaneGeometry(1404,870,1,2);
+      mapGeometry = new THREE.PlaneGeometry(1407,847,1,2);
       mapMesh = new THREE.Mesh(mapGeometry, mapMaterial);
       mapMesh.position.set(0,100,0);
       scene.add(mapMesh);
